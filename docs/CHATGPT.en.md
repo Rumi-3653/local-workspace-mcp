@@ -19,6 +19,7 @@ After setup, see the [everyday user guide](USAGE.en.md) for phones, host availab
 4. Connect the plugin in ChatGPT and make a real tool call as described below.
 
 The wizard cannot create your OpenAI account tunnel/key or approve the ChatGPT plugin for you. It never overwrites an existing key. The detailed manual commands below remain available for troubleshooting.
+To restart after closing the window or rebooting, use the same `Connect ChatGPT.command` again. It reuses the saved tunnel ID and client path, never the key value in its connection receipt. Press Enter for the default state directory, or enter the same custom path you chose during installation.
 
 ## Install and connect
 

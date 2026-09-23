@@ -70,6 +70,36 @@ def resolve_client(value: str | None, interactive: bool) -> Path:
     return path
 
 
+def load_connection(state: Path) -> dict[str, str]:
+    receipt = state / "connection.json"
+    if not receipt.exists():
+        return {}
+    require_private_file(receipt)
+    value = json.loads(receipt.read_text())
+    if not isinstance(value, dict):
+        raise ValueError(f"連線紀錄格式不正確：{receipt}")
+    client = value.get("tunnel_client")
+    tunnel_id = value.get("tunnel_id")
+    if not isinstance(client, str) or not isinstance(tunnel_id, str) or not TUNNEL_ID.fullmatch(tunnel_id):
+        raise ValueError(f"連線紀錄格式不正確：{receipt}")
+    return {"tunnel_client": client, "tunnel_id": tunnel_id}
+
+
+def save_connection(state: Path, client: Path, tunnel_id: str) -> None:
+    receipt = state / "connection.json"
+    if receipt.exists():
+        require_private_file(receipt)
+    descriptor, temporary = tempfile.mkstemp(prefix="connection-", dir=state)
+    try:
+        with os.fdopen(descriptor, "w") as stream:
+            json.dump({"tunnel_client": str(client), "tunnel_id": tunnel_id}, stream)
+            stream.write("\n")
+        os.replace(temporary, receipt)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
 def configure(state: Path, client: Path, tunnel_id: str, key: str | None) -> Path:
     if not TUNNEL_ID.fullmatch(tunnel_id):
         raise ValueError("通道 ID 格式應是 tunnel_ 加 32 位小寫十六進位字元。")
@@ -143,17 +173,21 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.interactive:
             print("將本機工具連接到一般 ChatGPT 對話。")
-            print("請先建立通道和只允許 Tunnels Read + Use 的 runtime key：")
-            print("https://platform.openai.com/settings/organization/tunnels")
-            print("https://platform.openai.com/settings/organization/api-keys")
         if args.interactive and args.state is None:
             default = REPO / ".local/state"
             args.state = Path(input(f"私有設定資料夾 [{default}]：").strip() or str(default))
         if args.state is None:
             parser.error("請提供 --state，或使用 --interactive。")
         state = args.state.expanduser().resolve()
-        client = resolve_client(args.tunnel_client, args.interactive)
-        tunnel_id = args.tunnel_id
+        previous = load_connection(state)
+        if args.interactive and not previous:
+            print("請先建立通道和只允許 Tunnels Read + Use 的 runtime key：")
+            print("https://platform.openai.com/settings/organization/tunnels")
+            print("https://platform.openai.com/settings/organization/api-keys")
+        elif args.interactive:
+            print("找到上次的通道 ID 與用戶端路徑；金鑰仍只存於私有檔案。")
+        client = resolve_client(args.tunnel_client or previous.get("tunnel_client"), args.interactive)
+        tunnel_id = args.tunnel_id or previous.get("tunnel_id")
         if args.interactive and tunnel_id is None:
             tunnel_id = input("通道 ID（tunnel_...）：").strip()
         if not tunnel_id or not TUNNEL_ID.fullmatch(tunnel_id):
@@ -168,6 +202,7 @@ def main(argv: list[str] | None = None) -> int:
             if not key.startswith("sk-") or len(key) < 20 or any(char.isspace() for char in key):
                 raise ValueError("金鑰格式不正確；沒有修改通道設定。")
         config = configure(state, client, tunnel_id, key)
+        save_connection(state, client, tunnel_id)
         print("官方診斷通過。使用 ChatGPT 時請保持這個指令運作：")
         print("  " + shlex.join([str(client), "run", "--config", str(config)]))
         print("接著在 ChatGPT 建立並連接外掛，依 docs/CHATGPT.md 做真實工具測試。")

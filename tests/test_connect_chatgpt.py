@@ -8,6 +8,9 @@ import pytest
 CONNECT = runpy.run_path(str(Path(__file__).resolve().parents[1] / "scripts/connect_chatgpt.py"))
 configure = CONNECT["configure"]
 prepare_config = CONNECT["prepare_config"]
+load_connection = CONNECT["load_connection"]
+save_connection = CONNECT["save_connection"]
+main = CONNECT["main"]
 
 
 SAMPLE = """control_plane:
@@ -108,3 +111,42 @@ def test_failed_doctor_leaves_no_new_key_or_profile(tmp_path, monkeypatch):
         configure(state, client, TUNNEL_ID, "sk-test-secret-000000000000")
     assert not (state / "runtime-key").exists()
     assert not (state / "tunnel-profiles/local-workspace.yaml").exists()
+
+
+def test_connection_receipt_keeps_only_nonsecret_reuse_values(tmp_path):
+    state = tmp_path / "state"
+    state.mkdir(mode=0o700)
+    client = tmp_path / "tunnel-client"
+    save_connection(state, client, TUNNEL_ID)
+    receipt = state / "connection.json"
+    assert load_connection(state) == {"tunnel_client": str(client), "tunnel_id": TUNNEL_ID}
+    assert "runtime-key" not in receipt.read_text()
+    assert os.stat(receipt).st_mode & 0o077 == 0
+
+
+def test_second_double_click_reuses_connection_without_key_prompt(tmp_path, monkeypatch):
+    state = tmp_path / "state"
+    state.mkdir(mode=0o700)
+    launch = state / "launch.sh"
+    launch.write_text("#!/bin/sh\n")
+    launch.chmod(0o700)
+    key = state / "runtime-key"
+    key.write_text("sk-existing-private-key\n")
+    key.chmod(0o600)
+    client = tmp_path / "tunnel-client"
+    client.write_text("")
+    client.chmod(0o700)
+    save_connection(state, client, TUNNEL_ID)
+    calls = []
+
+    def fake_run(command, **_kwargs):
+        calls.append(command)
+        if "init" in command:
+            Path(command[command.index("--profile-dir") + 1], "local-workspace.yaml").write_text(SAMPLE)
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    monkeypatch.setattr("builtins.input", lambda _prompt: pytest.fail("unexpected interactive prompt"))
+    assert main(["--interactive", "--run", "--state", str(state)]) == 0
+    assert calls[-1][1] == "run"
+    assert key.read_text() == "sk-existing-private-key\n"
