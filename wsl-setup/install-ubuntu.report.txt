@@ -1,0 +1,19 @@
+# De-identified copy: machine name, Windows user name and user-profile paths are replaced with <placeholders>.
+START 2026-09-14T09:04:51.8461554+08:00
+whoami=<MACHINE>\<user>
+pid=57920 host=ConsoleHost
+mode=from-file D:\WSL\ubuntu-24.04.4-wsl-amd64.wsl size=391541571
+install exit=0 elapsed=10s
+  out: 正在安裝: D:\WSL\ubuntu-24.04.4-wsl-amd64.wsl
+  out: 已成功安裝發佈。可以透過 『wsl.exe -d Ubuntu-24.04' 啟動
+--- wsl -l -v ---
+  NAME              STATE           VERSION
+  * docker-desktop    Stopped         2
+  Ubuntu-24.04      Stopped         2
+--- HKCU Lxss ---
+  docker-desktop | BasePath=\\?\C:\Users\<user>\AppData\Local\Docker\wsl\main | Flags=15 | DefaultUid=0 | RunOOBE=0
+  Ubuntu-24.04 | BasePath=D:\WSL\Ubuntu-24.04 | Flags=15 | DefaultUid=0 | RunOOBE=1
+--- location listing ---
+  ext4.vhdx 146800640
+  shortcut.ico 37207
+END 2026-09-14T09:05:01.5341749+08:00 exit=0
