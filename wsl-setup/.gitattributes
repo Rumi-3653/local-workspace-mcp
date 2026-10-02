@@ -1,0 +1,3 @@
+# These shell scripts run inside WSL (often via /mnt/<drive>/...). Keep LF on checkout even when
+# Windows git has core.autocrlf=true, otherwise bash fails with "bad interpreter: bash\r".
+*.sh text eol=lf
