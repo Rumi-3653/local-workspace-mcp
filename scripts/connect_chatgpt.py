@@ -18,6 +18,13 @@ REPO = Path(__file__).resolve().parents[1]
 TUNNEL_ID = re.compile(r"tunnel_[0-9a-f]{32}\Z")
 
 
+def validate_runtime_key(key: str) -> None:
+    """Reject accidental repeated pastes without exposing credential contents."""
+    if (not key.startswith("sk-") or len(key) < 20
+            or key.count("sk-") != 1 or any(char.isspace() for char in key)):
+        raise ValueError("金鑰格式不正確，或重複貼上；請只貼上一次。沒有修改通道設定。")
+
+
 def prepare_config(sample: str, key_file: Path, health_file: Path) -> str:
     """Patch only the expected official sample fields; reject an unfamiliar layout."""
     lines = sample.splitlines()
@@ -124,6 +131,8 @@ def save_connection(state: Path, client: Path, tunnel_id: str, runtime: Path | N
 
 
 def configure(state: Path, client: Path, tunnel_id: str, key: str | None) -> Path:
+    if key is not None:
+        validate_runtime_key(key)
     if not TUNNEL_ID.fullmatch(tunnel_id):
         raise ValueError("通道 ID 格式應是 tunnel_ 加 32 位小寫十六進位字元。")
     launch = state / "launch.sh"
@@ -224,10 +233,9 @@ def main(argv: list[str] | None = None) -> int:
         if not key_file.exists():
             if not sys.stdin.isatty():
                 raise ValueError("請在互動式終端機輸入金鑰，避免金鑰進入命令列記錄。")
-            print("下一行貼上金鑰後按 Enter。畫面不顯示字元是正常的。")
+            print("下一行只貼上一次金鑰，再按 Enter。畫面不顯示字元是正常的，請勿重複貼上。")
             key = getpass.getpass("Runtime key（隱藏輸入）：").strip()
-            if not key.startswith("sk-") or len(key) < 20 or any(char.isspace() for char in key):
-                raise ValueError("金鑰格式不正確；沒有修改通道設定。")
+            validate_runtime_key(key)
         config = configure(state, client, tunnel_id, key)
         save_connection(state, client, tunnel_id, runtime)
         print("官方診斷通過。使用 ChatGPT 時請保持這個指令運作：")

@@ -11,6 +11,24 @@ prepare_config = CONNECT["prepare_config"]
 load_connection = CONNECT["load_connection"]
 save_connection = CONNECT["save_connection"]
 main = CONNECT["main"]
+validate_runtime_key = CONNECT["validate_runtime_key"]
+
+
+@pytest.mark.parametrize("key", [
+    "sk-test-secret-000000000000" * 2,
+    "sk-test-secret-000000000000sk-other-secret-000000000000",
+    "sk-test-secret-000000000000\nextra",
+])
+def test_repeated_or_multiline_key_is_rejected_before_writes(tmp_path, key):
+    state = tmp_path / "not-created"
+    with pytest.raises(ValueError) as error:
+        configure(state, tmp_path / "client", TUNNEL_ID, key)
+    assert key not in str(error.value)
+    assert not state.exists()
+
+
+def test_single_runtime_key_is_accepted():
+    validate_runtime_key("sk-test-secret-000000000000")
 
 
 SAMPLE = """control_plane:

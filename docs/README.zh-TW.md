@@ -4,6 +4,8 @@
 
 適用版本：main 最新原始碼。主要用途：**一般 ChatGPT 對話操作本機工具**。
 
+Windows 請參考 [WSL2 文件模式教學與驗證範圍](WINDOWS-WSL.md)。
+
 **原生 Windows 目前不支援，也尚未驗證。** 程式使用 Unix 專用 API；本頁安裝步驟適用於 Mac。
 本頁負責本機工具安裝；完成後接著照[ChatGPT 私人通道教學](CHATGPT.md)連線。
 

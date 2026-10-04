@@ -23,8 +23,8 @@ runtime 不包含額外的 Codex 助手、外掛管理或管理網頁，保留 M
 ## 最短連線流程（Mac）
 
 1. 雙擊 `Install.command` 安裝本機工具；記住安裝時的「私有設定資料夾」。
-2. 在 [OpenAI 通道設定](https://platform.openai.com/settings/organization/tunnels)建立私人通道，記下 `tunnel_...` ID；在 [API keys](https://platform.openai.com/settings/organization/api-keys)建立只允許 **Tunnels Read + Use** 的金鑰。從[官方 releases](https://github.com/openai/tunnel-client/releases)下載適合電腦的 `tunnel-client`，核對 SHA256 並解壓縮。
-3. 雙擊 **`Connect ChatGPT.command`**，輸入私有設定資料夾、`tunnel-client` 路徑與通道 ID。金鑰在隱藏輸入框貼上後按 Enter；畫面不會顯示任何字元是正常的。精靈會建立權限受限的金鑰檔與通道設定、執行 `doctor`，成功後直接啟動通道。**使用時保持視窗開啟。**
+2. 在 [OpenAI 通道設定](https://platform.openai.com/settings/organization/tunnels)建立私人通道，記下 `tunnel_...` ID；在 [API keys](https://platform.openai.com/settings/organization/api-keys)建立只允許 **Tunnels Read + Use** 的金鑰。從[官方 releases](https://github.com/openai/tunnel-client/releases)下載適合電腦的 `tunnel-client` 與 `tunnel-client-runtime`，核對 SHA256 並解壓縮。
+3. 雙擊 **`Connect ChatGPT.command`**，輸入私有設定資料夾、`tunnel-client` 路徑與通道 ID。金鑰在隱藏輸入框**只貼上一次**再按 Enter；畫面不顯示字元是正常的，請勿因此重複貼上。重複貼上會在寫入前被拒絕。精靈會建立權限受限的金鑰檔與通道設定、執行 `doctor`，成功後直接啟動通道。**使用時保持視窗開啟。**
 4. 依下方第 4 節在 ChatGPT 連接外掛並做真實工具呼叫測試。
 
 Linux 可在專案目錄執行 `python3 scripts/connect_chatgpt.py --interactive --run`，其餘步驟相同。
@@ -57,23 +57,25 @@ Linux 可在專案目錄執行 `python3 scripts/connect_chatgpt.py --interactive
 帳號是否有這些功能，以及費用，以你帳戶與官方當前條件為準。
 
 從 [OpenAI 官方 tunnel-client releases](https://github.com/openai/tunnel-client/releases)
-下載符合系統架構的版本；本次驗證為 **v0.0.14，macOS arm64**。核對官方 SHA256，解壓縮到自己的工具目錄。
+下載符合系統架構的 `tunnel-client` 與 `tunnel-client-runtime`（v0.0.15 或更新版）。核對官方 SHA256，解壓縮到自己的工具目錄。
+Mac 已驗證 runtime v0.0.15 的啟動與健康檢查；原本 v0.0.14 的 ChatGPT 對話結果屬於歷史驗證。
 以下以 `tunnel-client` 已在 PATH 為例；也可以使用二進位檔的絕對路徑。
 
 不要把金鑰貼在對話、Git、命令列引數或工作資料夾。這段會以隱藏輸入儲存，且不覆寫既有金鑰：
 
 ```sh
-python3 - <<'PY'
+python3 -c '
 import getpass, os
 from pathlib import Path
-path = Path(input('金鑰檔案完整路徑（放在私有設定資料夾）: ')).expanduser()
-key = getpass.getpass('貼上 Tunnels runtime key: ').strip()
-if not key.startswith('sk-'):
-    raise SystemExit('金鑰格式不正確')
+path = Path(input("金鑰檔案完整路徑（放在私有設定資料夾）: ")).expanduser()
+key = getpass.getpass("只貼上一次 Tunnels runtime key: ").strip()
+if (not key.startswith("sk-") or len(key) < 20
+        or key.count("sk-") != 1 or any(c.isspace() for c in key)):
+    raise SystemExit("金鑰格式不正確或重複貼上；沒有寫入金鑰")
 fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-with os.fdopen(fd, 'w') as f:
-    f.write(key + '\n')
-PY
+with os.fdopen(fd, "w") as f:
+    f.write(key + "\n")
+'
 ```
 
 ## 3. 設定並啟動通道
