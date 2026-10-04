@@ -29,8 +29,8 @@
 1. 下載上方最新版原始碼，放到準備長期保留的位置。
 2. 準備 Python、uv 等[必備工具](docs/README.zh-TW.md)，文件工作還需要運作中的 Docker。
 3. 執行 `Install.command`，明確選擇完整模式或文件模式。
-4. 到 OpenAI Platform 建立官方私人通道與只允許 **Tunnels Read + Use** 的 runtime key；下載並核對[官方 tunnel-client](https://github.com/openai/tunnel-client/releases)。
-5. 雙擊 **`Connect ChatGPT.command`**，依畫面輸入私有設定位置、官方用戶端位置、通道 ID 與金鑰。程式會產生設定並檢查連線；保持視窗開啟。
+4. 到 OpenAI Platform 建立官方私人通道與只允許 **Tunnels Read + Use** 的 runtime key；下載並核對[官方 tunnel-client 與 tunnel-client-runtime](https://github.com/openai/tunnel-client/releases)。
+5. 雙擊 **`Connect ChatGPT.command`**，依畫面輸入私有設定位置、官方設定用戶端與 runtime 位置、通道 ID 與金鑰。程式會產生設定並檢查連線；保持視窗開啟。
 6. 在 ChatGPT 的「外掛程式」新增通道，於新的普通「對話」呼叫 `run_python` 驗證。畫面步驟和測試文字見[一般 ChatGPT 教學](docs/CHATGPT.md)。
 7. Mac 可安裝有名稱的登入啟動 App，讓通道在登入後自動恢復。
 

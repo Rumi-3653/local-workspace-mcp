@@ -11,6 +11,15 @@ restarting the tunnel. Native ChatGPT App conversation acceptance remains pendin
 
 After setup, see the [everyday user guide](USAGE.en.md) for phones, host availability and output access.
 
+## Use the runtime for long-lived connections
+
+Download both official v0.0.15 or newer executables: `tunnel-client` for `init`/`doctor`,
+and `tunnel-client-runtime` for foreground and login startup. Keep them side by side;
+the wizard discovers the runtime there, or accepts `--runtime-client /absolute/path/tunnel-client-runtime`.
+The narrow runtime does not contain the optional Codex assistant, plugin manager or admin UI.
+It retains the MCP tunnel and health endpoints. Full CLI builds can launch an extra Codex process;
+the startup helpers now reject them as the running binary. See [the fix and migration notes](TUNNEL-LIFECYCLE.md).
+
 ## Short setup path
 
 1. Install the local tools with `Install.command` and keep the private state directory you selected.
@@ -48,7 +57,7 @@ Use mode `0600` for the profile, then run:
 
 ```sh
 tunnel-client doctor --config /absolute/private-state/tunnel-profiles/local-workspace.yaml
-tunnel-client run --config /absolute/private-state/tunnel-profiles/local-workspace.yaml
+tunnel-client-runtime run --config /absolute/private-state/tunnel-profiles/local-workspace.yaml
 ```
 
 5. In ChatGPT, enable developer mode under Security/login. Go to Plugins → Create app, enter
@@ -70,7 +79,7 @@ With Xcode Command Line Tools installed, run from the project:
 
 ```sh
 python3 scripts/install_macos_autostart.py \
-  --tunnel-client /absolute/path/tunnel-client \
+  --tunnel-client /absolute/path/tunnel-client-runtime \
   --config /absolute/private-state/tunnel-profiles/local-workspace.yaml \
   --name 'ChatGPT Local Workspace MCP'
 ```
