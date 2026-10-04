@@ -12,6 +12,18 @@
 
 安裝完成後請看[日常使用說明](USAGE.zh-TW.md)：電腦／手機對話、主機保持開機、產出與故障排除。
 
+## 最短連線流程（Mac）
+
+1. 雙擊 `Install.command` 安裝本機工具；記住安裝時的「私有設定資料夾」。
+2. 在 [OpenAI 通道設定](https://platform.openai.com/settings/organization/tunnels)建立私人通道，記下 `tunnel_...` ID；在 [API keys](https://platform.openai.com/settings/organization/api-keys)建立只允許 **Tunnels Read + Use** 的金鑰。從[官方 releases](https://github.com/openai/tunnel-client/releases)下載適合電腦的 `tunnel-client`，核對 SHA256 並解壓縮。
+3. 雙擊 **`Connect ChatGPT.command`**，輸入私有設定資料夾、`tunnel-client` 路徑與通道 ID。金鑰在隱藏輸入框貼上後按 Enter；畫面不會顯示任何字元是正常的。精靈會建立權限受限的金鑰檔與通道設定、執行 `doctor`，成功後直接啟動通道。**使用時保持視窗開啟。**
+4. 依下方第 4 節在 ChatGPT 連接外掛並做真實工具呼叫測試。
+
+Linux 可在專案目錄執行 `python3 scripts/connect_chatgpt.py --interactive --run`，其餘步驟相同。
+這個精靈不會替你在 OpenAI 帳戶建立通道或金鑰，也不會自動點選 ChatGPT 的授權畫面。
+金鑰不可貼到聊天內容；已存在的金鑰檔不會被精靈覆寫。若需排錯或手動設定，再看下方完整步驟。
+下次要重新啟動通道，再雙擊同一個 `Connect ChatGPT.command`；精靈會讀取私有設定中的通道 ID 與用戶端路徑，不必重填金鑰。按 Enter 使用預設的私有設定資料夾即可；若第一次選了其他路徑，請輸入同一路徑。
+
 ## 1. 安裝本機工具
 
 下載 [main 最新原始碼 ZIP](https://github.com/arumwu/local-workspace-mcp/archive/refs/heads/main.zip)，

@@ -11,6 +11,16 @@ restarting the tunnel. Native ChatGPT App conversation acceptance remains pendin
 
 After setup, see the [everyday user guide](USAGE.en.md) for phones, host availability and output access.
 
+## Short setup path
+
+1. Install the local tools with `Install.command` and keep the private state directory you selected.
+2. Create a tunnel in [OpenAI Platform](https://platform.openai.com/settings/organization/tunnels), and a runtime key restricted to **Tunnels Read + Use** in [API keys](https://platform.openai.com/settings/organization/api-keys). Download the matching [official tunnel-client](https://github.com/openai/tunnel-client/releases) and verify its SHA256 checksum.
+3. On Mac, double-click **`Connect ChatGPT.command`**. On Linux, run `python3 scripts/connect_chatgpt.py --interactive --run`. Enter the private state path, official client path, and tunnel ID. Paste the key at the hidden prompt and press Enter; no visible characters is normal. The wizard creates the private profile, runs `doctor`, then keeps the tunnel running. Leave that window open while using ChatGPT.
+4. Connect the plugin in ChatGPT and make a real tool call as described below.
+
+The wizard cannot create your OpenAI account tunnel/key or approve the ChatGPT plugin for you. It never overwrites an existing key. The detailed manual commands below remain available for troubleshooting.
+To restart after closing the window or rebooting, use the same `Connect ChatGPT.command` again. It reuses the saved tunnel ID and client path, never the key value in its connection receipt. Press Enter for the default state directory, or enter the same custom path you chose during installation.
+
 ## Install and connect
 
 1. Download the [current source ZIP](https://github.com/arumwu/local-workspace-mcp/archive/refs/heads/main.zip).

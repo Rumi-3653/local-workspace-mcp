@@ -84,8 +84,9 @@ Docker Desktop 請依[官方 Mac 安裝說明](https://docs.docker.com/desktop/s
 ## 5. 安裝完成後接上 ChatGPT
 
 本機工具安裝器產生私有設定資料夾內的 `launch.sh`。
-預設不再修改 Codex／本機 STDIO 設定；請繼續[官方私人通道教學](CHATGPT.md)，
-完成通道、金鑰、ChatGPT 外掛連線及 Python 真實呼叫測試。
+接著依[ChatGPT 私人通道教學](CHATGPT.md)建立通道、受限金鑰並下載官方用戶端，
+然後雙擊 **`Connect ChatGPT.command`**。它會引導輸入、建立私有設定、執行診斷並啟動通道。
+設定完成後才到 ChatGPT 新增外掛，做 Python 真實呼叫測試。
 
 ## 6. 回到一般 ChatGPT 對話使用
 
