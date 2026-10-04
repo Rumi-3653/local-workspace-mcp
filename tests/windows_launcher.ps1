@@ -84,3 +84,6 @@ public class FakeWsl {
     $env:LWMCP_TEST_EXIT = $oldExit
     if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
+# The final negative test deliberately left a nonzero native LASTEXITCODE.
+# A thrown assertion bypasses this line; successful assertions report success.
+exit 0
