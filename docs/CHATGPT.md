@@ -57,24 +57,25 @@ Linux 可在專案目錄執行 `python3 scripts/connect_chatgpt.py --interactive
 帳號是否有這些功能，以及費用，以你帳戶與官方當前條件為準。
 
 從 [OpenAI 官方 tunnel-client releases](https://github.com/openai/tunnel-client/releases)
-下載符合系統架構的版本；本次驗證為 **v0.0.14，macOS arm64**。核對官方 SHA256，解壓縮到自己的工具目錄。
+下載符合系統架構的 `tunnel-client` 與 `tunnel-client-runtime`（v0.0.15 或更新版）。核對官方 SHA256，解壓縮到自己的工具目錄。
+Mac 已驗證 runtime v0.0.15 的啟動與健康檢查；原本 v0.0.14 的 ChatGPT 對話結果屬於歷史驗證。
 以下以 `tunnel-client` 已在 PATH 為例；也可以使用二進位檔的絕對路徑。
 
 不要把金鑰貼在對話、Git、命令列引數或工作資料夾。這段會以隱藏輸入儲存，且不覆寫既有金鑰：
 
 ```sh
-python3 - <<'PY'
+python3 -c '
 import getpass, os
 from pathlib import Path
-path = Path(input('金鑰檔案完整路徑（放在私有設定資料夾）: ')).expanduser()
-key = getpass.getpass('只貼上一次 Tunnels runtime key: ').strip()
-if (not key.startswith('sk-') or len(key) < 20
-        or key.count('sk-') != 1 or any(c.isspace() for c in key)):
-    raise SystemExit('金鑰格式不正確或重複貼上；沒有寫入金鑰')
+path = Path(input("金鑰檔案完整路徑（放在私有設定資料夾）: ")).expanduser()
+key = getpass.getpass("只貼上一次 Tunnels runtime key: ").strip()
+if (not key.startswith("sk-") or len(key) < 20
+        or key.count("sk-") != 1 or any(c.isspace() for c in key)):
+    raise SystemExit("金鑰格式不正確或重複貼上；沒有寫入金鑰")
 fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-with os.fdopen(fd, 'w') as f:
-    f.write(key + '\n')
-PY
+with os.fdopen(fd, "w") as f:
+    f.write(key + "\n")
+'
 ```
 
 ## 3. 設定並啟動通道

@@ -40,7 +40,8 @@ To restart after closing the window or rebooting, use the same `Connect ChatGPT.
    associated with the ChatGPT workspace you will use. Create a restricted runtime API key with **Tunnels Read + Use**.
    Account availability and charges must be checked against current official terms. No shared project key is provided.
 3. Obtain the matching binary from [official tunnel-client releases](https://github.com/openai/tunnel-client/releases)
-   and verify its checksum. Tested: v0.0.14 on macOS arm64. Store the runtime key in a private file with mode `0600`,
+   and verify both archives against SHA256SUMS.txt. Use v0.0.15 or newer setup/runtime binaries.
+   Runtime v0.0.15 startup and health checks passed on macOS arm64; the older v0.0.14 ChatGPT conversation result is historical. Store the runtime key in a private file with mode `0600`,
    outside shared files and Git. Never paste it into chat or pass its value as a command argument.
 4. Generate a STDIO profile:
 
