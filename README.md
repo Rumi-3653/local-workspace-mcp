@@ -26,7 +26,7 @@
 
 ## 怎麼安裝？
 
-Windows 使用者可參考 [WSL2 文件模式設定與驗證範圍](docs/WINDOWS-WSL.md)；這不代表原生 Windows 支援。
+Windows 使用者可參考 [WSL2 設定與 Windows 操作入口](docs/WINDOWS-WSL.md)：`Install.cmd` 與 `Connect ChatGPT.cmd` 呼叫既有 WSL2 安裝及連線流程，仍需先準備 Linux 內的專案與工具；這不代表原生 Windows 支援。
 
 1. 下載上方最新版原始碼，放到準備長期保留的位置。
 2. 準備 Python、uv 等[必備工具](docs/README.zh-TW.md)，文件工作還需要運作中的 Docker。

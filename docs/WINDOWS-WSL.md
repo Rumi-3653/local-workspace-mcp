@@ -75,6 +75,64 @@ Do not shut down all WSL distributions for this test. Closing the terminal,
 shutting down WSL, sleeping or turning off the PC can disconnect ChatGPT.
 This recipe does not install a Windows login task or promise reboot persistence.
 
+## Windows install and connect launchers (experimental)
+
+`Install.cmd` and `Connect ChatGPT.cmd` provide Windows entry points for an
+**existing Linux checkout**. They use the same `scripts/install.py` and
+`scripts/connect_chatgpt.py` described above, including the runtime-only connection
+and hidden key prompt. They do not install WSL, clone another version of the
+server, download tunnel binaries, register clients, or configure login startup.
+The `.cmd` wrappers use Windows PowerShell 5.1 with process-only `RemoteSigned`;
+company execution policies still apply.
+
+1. Complete the prerequisites above and clone this repository inside your
+   non-root WSL user's Linux filesystem, for example `~/local-workspace-mcp`.
+   Use a checkout containing `scripts/windows_wsl.py`.
+2. On Windows, take `Install.cmd`, `Connect ChatGPT.cmd` and
+   `scripts/windows.ps1` from the **same revision**, preserving the `scripts`
+   subdirectory. They can be kept in a regular Windows folder. The repository,
+   virtual environment, private state and tunnel binaries remain inside Linux.
+3. In PowerShell in that Windows folder, run the following, replacing the distro
+   with its actual name from `wsl --list --verbose`:
+
+   ```powershell
+   .\Install.cmd -Distro Ubuntu-24.04 -Repository "~/local-workspace-mcp" -Workspace "C:\MCP Documents"
+   & '.\Connect ChatGPT.cmd'
+   ```
+
+The default workspace is `~/LocalWorkspace` and the default state directory is
+`~/.local/state/local-workspace-mcp-wsl`. Supply `-State` for a different dedicated
+Linux directory under your WSL home. State, workspace and source must not overlap.
+Windows workspace paths are converted with `wslpath`; Linux absolute and `~/`
+workspace paths are accepted too. Paths with spaces and Unicode are forwarded as
+arguments. Quotes and line breaks in paths are rejected.
+
+After a successful installation, only the distro, repository, state and workspace
+choices are saved in `%LOCALAPPDATA%\LocalWorkspaceMCPWSL\settings.json`.
+Reconnection reuses these choices; full permissions are never restored implicitly
+for a new installation. With multiple distros and no saved selection, specify
+`-Distro`. This settings file is separate from the community Windows integration's
+settings; there is no automatic migration of existing private installations.
+
+Documents mode remains the default and requires working Docker inside WSL. The
+optional full mode requires `-Mode full -AcceptFullPermissions` on **each install**;
+use a separate state and workspace when trying it. Add `-SkipWorker` only with
+explicitly accepted full mode. Full mode runs with the WSL user's permissions,
+including accessible Windows mounts; it is not confined to the workspace.
+
+For a GitHub ZIP blocked by Windows, review the source and unblock the downloaded
+ZIP through Properties before extracting again; do not weaken the global execution
+policy. Launch failures return a nonzero exit code and leave saved Windows settings
+unchanged. Keep the connection terminal open and stop with Ctrl+C. Use the health
+and real ChatGPT checks above after connecting.
+
+These entry points are adapted from the MIT-licensed
+[community Windows/WSL integration](https://github.com/oscar2012-dot/local-workspace-mcp-windows).
+Automated bridge tests use mocked subprocesses; Windows CI uses a fake `wsl.exe`
+to test argument forwarding, saved settings and failure handling. Neither is a
+clean Windows/WSL installation, Docker document workflow or ChatGPT end-to-end test.
+Those checks remain required, including restart behavior and both installation modes.
+
 ## Optional Windows STDIO client
 
 Windows clients can launch the Linux MCP independently of the ChatGPT tunnel.
