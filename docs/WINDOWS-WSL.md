@@ -2,8 +2,8 @@
 
 This runs the Linux server inside WSL2; it does **not** add native Windows support.
 Keep the repository, Python environment, private state and official Linux
-tunnel-client in the Linux filesystem. A dedicated document workspace can live
-under `/mnt/c/Users/YOUR_WINDOWS_USER/Documents/LocalWorkspace`.
+tunnel-client and tunnel-client-runtime in the Linux filesystem. A dedicated
+document workspace can live under `/mnt/c/Users/YOUR_WINDOWS_USER/Documents/LocalWorkspace`.
 
 ## Prerequisites
 
@@ -11,8 +11,10 @@ under `/mnt/c/Users/YOUR_WINDOWS_USER/Documents/LocalWorkspace`.
 - Git, Python 3.12+, uv, and a working Docker CLI/daemon inside that distribution.
   Verify `docker info` as the same Linux user that will run MCP. Docker Desktop
   WSL integration and Docker inside WSL are alternatives; choose one working setup.
-- The official Linux tunnel-client matching `uname -m`, downloaded from
-  https://github.com/openai/tunnel-client/releases and verified against its SHA256.
+- Both official Linux v0.0.15 or newer binaries matching `uname -m`: `tunnel-client`
+  for setup/diagnostics and `tunnel-client-runtime` for the running connection.
+  Download them from https://github.com/openai/tunnel-client/releases and verify
+  the archives against that release's SHA256SUMS.txt. Keep both binaries together.
 - OpenAI tunnel/workspace access and a key restricted to Tunnels Read + Use.
 
 Use a regular Linux user where possible. The existing installation tested below
@@ -32,7 +34,8 @@ python3 scripts/install.py \
 
 .venv/bin/python scripts/connect_chatgpt.py --interactive --run \
   --state /home/YOUR_LINUX_USER/.local/state/local-workspace-mcp \
-  --tunnel-client /home/YOUR_LINUX_USER/tools/tunnel-client/tunnel-client
+  --tunnel-client /home/YOUR_LINUX_USER/tools/tunnel-client/tunnel-client \
+  --runtime-client /home/YOUR_LINUX_USER/tools/tunnel-client/tunnel-client-runtime
 ```
 
 Keep private state on the Linux filesystem, outside the document workspace, so
@@ -88,6 +91,12 @@ than replacing the whole configuration file. Merely installing Docker Desktop
 on Windows does not verify Docker access inside Ubuntu.
 
 ## Validation scope
+
+The contributor reported the observations below for commit `ba42837`, before
+the runtime-only change. They are historical evidence, not a clean-install or
+WSL validation of the current runtime recipe. Repeat the health/control-plane
+and ChatGPT checks above after migrating to `tunnel-client-runtime`; see
+[the migration notes](TUNNEL-LIFECYCLE.md).
 
 On 2026-10-04 an existing Windows + WSL Ubuntu document-mode installation was
 updated to `ba42837`. A Windows MCP client launched `wsl.exe`, discovered 14 tools

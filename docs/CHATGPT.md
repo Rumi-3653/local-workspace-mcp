@@ -23,8 +23,8 @@ runtime 不包含額外的 Codex 助手、外掛管理或管理網頁，保留 M
 ## 最短連線流程（Mac）
 
 1. 雙擊 `Install.command` 安裝本機工具；記住安裝時的「私有設定資料夾」。
-2. 在 [OpenAI 通道設定](https://platform.openai.com/settings/organization/tunnels)建立私人通道，記下 `tunnel_...` ID；在 [API keys](https://platform.openai.com/settings/organization/api-keys)建立只允許 **Tunnels Read + Use** 的金鑰。從[官方 releases](https://github.com/openai/tunnel-client/releases)下載適合電腦的 `tunnel-client`，核對 SHA256 並解壓縮。
-3. 雙擊 **`Connect ChatGPT.command`**，輸入私有設定資料夾、`tunnel-client` 路徑與通道 ID。金鑰在隱藏輸入框貼上後按 Enter；畫面不會顯示任何字元是正常的。精靈會建立權限受限的金鑰檔與通道設定、執行 `doctor`，成功後直接啟動通道。**使用時保持視窗開啟。**
+2. 在 [OpenAI 通道設定](https://platform.openai.com/settings/organization/tunnels)建立私人通道，記下 `tunnel_...` ID；在 [API keys](https://platform.openai.com/settings/organization/api-keys)建立只允許 **Tunnels Read + Use** 的金鑰。從[官方 releases](https://github.com/openai/tunnel-client/releases)下載適合電腦的 `tunnel-client` 與 `tunnel-client-runtime`，核對 SHA256 並解壓縮。
+3. 雙擊 **`Connect ChatGPT.command`**，輸入私有設定資料夾、`tunnel-client` 路徑與通道 ID。金鑰在隱藏輸入框**只貼上一次**再按 Enter；畫面不顯示字元是正常的，請勿因此重複貼上。重複貼上會在寫入前被拒絕。精靈會建立權限受限的金鑰檔與通道設定、執行 `doctor`，成功後直接啟動通道。**使用時保持視窗開啟。**
 4. 依下方第 4 節在 ChatGPT 連接外掛並做真實工具呼叫測試。
 
 Linux 可在專案目錄執行 `python3 scripts/connect_chatgpt.py --interactive --run`，其餘步驟相同。
@@ -67,9 +67,10 @@ python3 - <<'PY'
 import getpass, os
 from pathlib import Path
 path = Path(input('金鑰檔案完整路徑（放在私有設定資料夾）: ')).expanduser()
-key = getpass.getpass('貼上 Tunnels runtime key: ').strip()
-if not key.startswith('sk-'):
-    raise SystemExit('金鑰格式不正確')
+key = getpass.getpass('只貼上一次 Tunnels runtime key: ').strip()
+if (not key.startswith('sk-') or len(key) < 20
+        or key.count('sk-') != 1 or any(c.isspace() for c in key)):
+    raise SystemExit('金鑰格式不正確或重複貼上；沒有寫入金鑰')
 fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
 with os.fdopen(fd, 'w') as f:
     f.write(key + '\n')
