@@ -12,6 +12,14 @@
 
 安裝完成後請看[日常使用說明](USAGE.zh-TW.md)：電腦／手機對話、主機保持開機、產出與故障排除。
 
+## 長期連線改用 runtime 專用版
+
+請從官方下載 v0.0.15 或更新版的兩個執行檔：`tunnel-client` 負責 `init`／`doctor`，
+`tunnel-client-runtime` 負責前景執行與登入自啟。兩者放在同一資料夾，精靈就會自動找到；
+也可用 `--runtime-client /absolute/path/tunnel-client-runtime` 指定。
+runtime 不包含額外的 Codex 助手、外掛管理或管理網頁，保留 MCP 私人通道與健康檢查。
+啟動器會拒絕把完整 CLI 當成常駐程式。詳見[修正與既有安裝遷移](TUNNEL-LIFECYCLE.md)。
+
 ## 最短連線流程（Mac）
 
 1. 雙擊 `Install.command` 安裝本機工具；記住安裝時的「私有設定資料夾」。
@@ -97,7 +105,7 @@ health:
 ```sh
 chmod 600 /absolute/path/private-state/tunnel-profiles/local-workspace.yaml
 tunnel-client doctor --config /absolute/path/private-state/tunnel-profiles/local-workspace.yaml
-tunnel-client run --config /absolute/path/private-state/tunnel-profiles/local-workspace.yaml
+tunnel-client-runtime run --config /absolute/path/private-state/tunnel-profiles/local-workspace.yaml
 ```
 
 這個前景程序需要保持執行；此時關閉終端機會中斷連線。正式使用可接著設定第 5 節的登入自啟。
@@ -126,7 +134,7 @@ tunnel-client run --config /absolute/path/private-state/tunnel-profiles/local-wo
 
 ```sh
 python3 scripts/install_macos_autostart.py \
-  --tunnel-client /absolute/path/tunnel-client \
+  --tunnel-client /absolute/path/tunnel-client-runtime \
   --config /absolute/path/private-state/tunnel-profiles/local-workspace.yaml \
   --name 'ChatGPT 本機工具'
 ```
