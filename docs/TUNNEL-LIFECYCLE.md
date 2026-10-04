@@ -34,3 +34,15 @@ tunnel ID only; no key value. The login installer likewise rejects a full CLI as
 
 自動啟動程式仍可保留原本名稱與隱藏狀態。健康監測可作備援，但不是這個修正的替代品。
 長期穩定性仍需要實際使用觀察；若再次出現高 CPU，應保留當次程序與堆疊證據。
+
+## Dependency audit compatibility
+
+The lockfile refresh updates `brace-expansion` (1.1.21 / 2.1.7), `fast-uri` (3.1.8)
+and `ip-address` (10.7.3). Desktop Commander stays pinned to 0.2.50.
+`md-to-pdf` alone overrides `chokidar` to 4.0.3 to remove the unpatched `braces`
+dependency ([advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)).
+The MCP PDF API does not use the CLI watcher. Chokidar v4 retains CommonJS and
+exact-file watching but removes glob expansion; when using the optional md-to-pdf
+CLI directly, pass explicit filenames (or shell-expanded globs), not quoted glob
+patterns. A regression test loads the PDF API and observes an actual file change,
+including a filename containing literal braces. No audit exclusions are used.
