@@ -4,6 +4,12 @@
 
 適用版本：main 最新原始碼。主要用途：**一般 ChatGPT 對話操作本機工具**。
 
+Windows 請參考 [WSL2 文件模式教學與驗證範圍](WINDOWS-WSL.md)。新增的實驗性 `Install.cmd` 與 `Connect ChatGPT.cmd` 可從 Windows 啟動既有 WSL2 安裝／連線流程。須先在非 root 的 WSL2 使用者下準備 Linux 專案、Python 3.12、uv、Docker 與官方通道程式；不會自動安裝這些前置工具。
+
+Windows 端保留兩個 `.cmd` 與 `scripts/windows.ps1`，Linux 端使用同版本的完整專案。首次可執行 `Install.cmd -Distro Ubuntu-24.04 -Repository "~/local-workspace-mcp" -Workspace "C:\MCP Documents"`，成功後雙擊 `Connect ChatGPT.cmd`。發行版名稱須依自己的電腦調整。安裝預設為文件模式；完整模式每次都須明確加上 `-Mode full -AcceptFullPermissions`，完整模式可存取 WSL 使用者有權限的 Windows 磁碟。
+
+Windows 設定只保存發行版與資料夾選擇，金鑰仍由既有連線精靈在 WSL 內隱藏輸入。Windows CI 的 WSL 是模擬程式；乾淨電腦安裝、Docker 文件流程與 ChatGPT 端到端驗收尚未完成。
+
 **原生 Windows 目前不支援，也尚未驗證。** 程式使用 Unix 專用 API；本頁安裝步驟適用於 Mac。
 本頁負責本機工具安裝；完成後接著照[ChatGPT 私人通道教學](CHATGPT.md)連線。
 
@@ -84,8 +90,9 @@ Docker Desktop 請依[官方 Mac 安裝說明](https://docs.docker.com/desktop/s
 ## 5. 安裝完成後接上 ChatGPT
 
 本機工具安裝器產生私有設定資料夾內的 `launch.sh`。
-預設不再修改 Codex／本機 STDIO 設定；請繼續[官方私人通道教學](CHATGPT.md)，
-完成通道、金鑰、ChatGPT 外掛連線及 Python 真實呼叫測試。
+接著依[ChatGPT 私人通道教學](CHATGPT.md)建立通道、受限金鑰並下載官方用戶端，
+然後雙擊 **`Connect ChatGPT.command`**。它會引導輸入、建立私有設定、執行診斷並啟動通道。
+設定完成後才到 ChatGPT 新增外掛，做 Python 真實呼叫測試。
 
 ## 6. 回到一般 ChatGPT 對話使用
 

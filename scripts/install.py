@@ -121,4 +121,5 @@ print(
     else "Document mode runs Python inside Docker with read-only inputs."
 )
 
-print("Next: docs/CHATGPT.md — connect a private tunnel in ChatGPT Plugins, then test in a new conversation.")
+print("Next: create a private OpenAI tunnel and restricted key, then run Connect ChatGPT.command")
+print("(or python3 scripts/connect_chatgpt.py --interactive --run on Linux). See docs/CHATGPT.md.")
